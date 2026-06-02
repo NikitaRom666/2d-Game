@@ -114,6 +114,13 @@ MonoBehaviour:
   - {fileID: -2782005931068294496, guid: 7e07952ad4e23504dac1c69dffaa3b9a, type: 3}
   - {fileID: 4764804083572976770, guid: 7e07952ad4e23504dac1c69dffaa3b9a, type: 3}
   - {fileID: 7185976239878469156, guid: 7e07952ad4e23504dac1c69dffaa3b9a, type: 3}
+  spriteFlipX:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
 --- !u!61 &7649537282546438679
 BoxCollider2D:
   m_ObjectHideFlags: 0
