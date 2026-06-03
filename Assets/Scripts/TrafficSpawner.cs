@@ -59,41 +59,51 @@ public class TrafficSpawner : MonoBehaviour
     }
 
     void TrySpawn(int laneIndex)
+{
+    float x = lanePositions[laneIndex];
+
+    int carsInLane = 0;
+
+    GameObject[] allCars =
+        GameObject.FindGameObjectsWithTag("EnemyCar");
+
+    foreach (GameObject car in allCars)
     {
-        float x = lanePositions[laneIndex];
-
-        // рахуємо машини тільки в цій смузі
-        int carsInLane = 0;
-        GameObject[] allCars = GameObject.FindGameObjectsWithTag("EnemyCar");
-
-        foreach (GameObject car in allCars)
+        if (Mathf.Abs(car.transform.position.x - x) < 0.5f)
         {
-            if (Mathf.Abs(car.transform.position.x - x) < 0.5f)
-            {
-                carsInLane++;
-            }
-        }
-
-        // ❗ якщо вже забагато — не спавнимо
-        if (carsInLane >= maxCarsPerLane)
-            return;
-
-        Vector2 spawnPos = new Vector2(x, spawnY);
-
-        Vector2 boxSize = new Vector2(0.8f, minDistanceBetweenCars);
-
-        Collider2D hit = Physics2D.OverlapBox(
-            spawnPos + Vector2.down * (minDistanceBetweenCars / 2),
-            boxSize,
-            0f,
-            carLayer
-        );
-
-        if (hit == null)
-        {
-            Instantiate(carPrefab, spawnPos, Quaternion.identity);
+            carsInLane++;
         }
     }
+
+    if (carsInLane >= maxCarsPerLane)
+        return;
+
+    Vector2 spawnPos = new Vector2(x, spawnY);
+
+    Vector2 boxSize =
+        new Vector2(0.8f, minDistanceBetweenCars);
+
+    Collider2D hit = Physics2D.OverlapBox(
+        spawnPos + Vector2.down * (minDistanceBetweenCars / 2),
+        boxSize,
+        0f,
+        carLayer
+    );
+
+    if (hit == null)
+    {
+        GameObject carObj =
+            Instantiate(carPrefab, spawnPos, Quaternion.identity);
+
+        EnemyCar enemyCar =
+            carObj.GetComponent<EnemyCar>();
+
+        bool oppositeLane =
+            laneIndex < laneCount / 2;
+
+        enemyCar.Setup(oppositeLane);
+    }
+}
 
     // візуалізація зон
     void OnDrawGizmosSelected()

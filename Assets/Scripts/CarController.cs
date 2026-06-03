@@ -71,6 +71,9 @@ public class CarController : MonoBehaviour
         // показати меню програшу
         gameOverPanel.SetActive(true);
 
+        FindFirstObjectByType<DistanceManager>()
+            .StopCounting();
+
         // стоп гри
         Time.timeScale = 0f;
     }
