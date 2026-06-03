@@ -2,34 +2,44 @@ using UnityEngine;
 
 public class EnemyCar : MonoBehaviour
 {
-    public float minOppositeSpeed = 12f;
-    public float maxOppositeSpeed = 16f;
+    [Header("Relative Speeds")]
+    public float minOppositeDifference = 6f;
+    public float maxOppositeDifference = 10f;
 
-    public float minSameDirectionSpeed = 3f;
-    public float maxSameDirectionSpeed = 6f;
+    public float minSameDifference = 1f;
+    public float maxSameDifference = 4f;
 
+    [Header("Sprites")]
     public Sprite[] carSprites;
 
     private SpriteRenderer sr;
+    private CarController player;
 
-    private float speed;
+    private bool oppositeLane;
+    private float relativeSpeed;
 
-    public void Setup(bool oppositeLane)
+    public void Setup(bool isOppositeLane)
     {
+        oppositeLane = isOppositeLane;
+
+        player = FindFirstObjectByType<CarController>();
+
         if (oppositeLane)
         {
-            speed = Random.Range(
-                minOppositeSpeed,
-                maxOppositeSpeed
+            // зустрічна смуга
+            relativeSpeed = Random.Range(
+                minOppositeDifference,
+                maxOppositeDifference
             );
 
             transform.rotation = Quaternion.Euler(0, 0, 180);
         }
         else
         {
-            speed = Random.Range(
-                minSameDirectionSpeed,
-                maxSameDirectionSpeed
+            // попутна смуга
+            relativeSpeed = Random.Range(
+                minSameDifference,
+                maxSameDifference
             );
 
             transform.rotation = Quaternion.identity;
@@ -42,15 +52,44 @@ public class EnemyCar : MonoBehaviour
 
         if (carSprites.Length > 0)
         {
-            sr.sprite =
-                carSprites[Random.Range(0, carSprites.Length)];
+            sr.sprite = carSprites[
+                Random.Range(0, carSprites.Length)
+            ];
+        }
+
+        if (player == null)
+        {
+            player = FindFirstObjectByType<CarController>();
         }
     }
 
     void Update()
     {
+        if (player == null)
+            return;
+
+        float playerSpeed = player.GetCurrentSpeed();
+
+        float finalSpeed;
+
+        if (oppositeLane)
+        {
+            // зустрічка швидша за нас
+            finalSpeed = playerSpeed + relativeSpeed;
+        }
+        else
+        {
+            // попутні трохи повільніші
+            finalSpeed = playerSpeed - relativeSpeed;
+
+            if (finalSpeed < 1f)
+                finalSpeed = 1f;
+        }
+
         transform.Translate(
-            Vector3.down * speed * Time.deltaTime,
+            Vector3.down *
+            finalSpeed *
+            Time.deltaTime,
             Space.World
         );
 

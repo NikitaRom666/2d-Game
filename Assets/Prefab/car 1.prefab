@@ -106,10 +106,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5f6387a987c8b24db9da75ca572063e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCar
-  minOppositeSpeed: 5
-  maxOppositeSpeed: 11
-  minSameDirectionSpeed: 1.3
-  maxSameDirectionSpeed: 5
+  minOppositeDifference: 2.32
+  maxOppositeDifference: 8
+  minSameDifference: 1
+  maxSameDifference: 8.52
   carSprites:
   - {fileID: -7203120349608966912, guid: 7e07952ad4e23504dac1c69dffaa3b9a, type: 3}
   - {fileID: -3256836276018792574, guid: 7e07952ad4e23504dac1c69dffaa3b9a, type: 3}

@@ -2,16 +2,32 @@ using UnityEngine;
 
 public class RoadScroller : MonoBehaviour
 {
-    public float speed = 5f;
-    public float height = 20f; // висота дороги
+    public float height = 20f;
+
+    private CarController player;
+
+    void Start()
+    {
+        player = FindFirstObjectByType<CarController>();
+    }
 
     void Update()
     {
-        transform.Translate(Vector3.down * speed * Time.deltaTime);
+        float currentSpeed = player.GetCurrentSpeed();
+
+        transform.Translate(
+            Vector3.down *
+            currentSpeed *
+            Time.deltaTime
+        );
 
         if (transform.position.y <= -height)
         {
-            transform.position += new Vector3(0, height * 2, 0);
+            transform.position += new Vector3(
+                0,
+                height * 2,
+                0
+            );
         }
     }
 }

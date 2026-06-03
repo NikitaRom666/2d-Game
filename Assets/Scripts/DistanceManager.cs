@@ -5,18 +5,28 @@ public class DistanceManager : MonoBehaviour
 {
     public TextMeshProUGUI distanceText;
 
-    public float metersPerSecond = 20f;
-
     private float distance;
     private bool gameOver;
 
+    private CarController player;
+
+    void Start()
+    {
+        player = FindFirstObjectByType<CarController>();
+    }
+
     void Update()
     {
-        if (gameOver) return;
+        if (gameOver)
+            return;
 
-        distance += metersPerSecond * Time.deltaTime;
+        if (player == null)
+            return;
 
-        distanceText.text = ((int)distance) + " m";
+        distance += player.GetCurrentSpeed() * Time.deltaTime;
+
+        distanceText.text =
+            Mathf.FloorToInt(distance) + " m";
     }
 
     public void StopCounting()
@@ -26,6 +36,6 @@ public class DistanceManager : MonoBehaviour
 
     public int GetDistance()
     {
-        return (int)distance;
+        return Mathf.FloorToInt(distance);
     }
 }
