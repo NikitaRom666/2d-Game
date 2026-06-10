@@ -1,41 +1,56 @@
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class DistanceManager : MonoBehaviour
 {
     public TextMeshProUGUI distanceText;
+    public TextMeshProUGUI recordText;
 
     private float distance;
-    private bool gameOver;
+    private bool counting = true;
 
-    private CarController player;
+    private int record;
 
     void Start()
     {
-        player = FindFirstObjectByType<CarController>();
+        record = PlayerPrefs.GetInt("Record", 0);
+
+        recordText.text =
+            "Рекорд: " + record + " м";
     }
 
     void Update()
     {
-        if (gameOver)
+        if (!counting)
             return;
 
-        if (player == null)
-            return;
+        CarController player =
+            FindFirstObjectByType<CarController>();
 
-        distance += player.GetCurrentSpeed() * Time.deltaTime;
+        distance +=
+            player.GetCurrentSpeed() *
+            Time.deltaTime;
 
         distanceText.text =
-            Mathf.FloorToInt(distance) + " m";
+            ((int)distance).ToString() + " м";
     }
 
     public void StopCounting()
     {
-        gameOver = true;
-    }
+        counting = false;
 
-    public int GetDistance()
-    {
-        return Mathf.FloorToInt(distance);
+        int currentDistance = (int)distance;
+
+        if (currentDistance > record)
+        {
+            record = currentDistance;
+
+            PlayerPrefs.SetInt(
+                "Record",
+                record
+            );
+
+            PlayerPrefs.Save();
+        }
     }
 }

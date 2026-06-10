@@ -1,4 +1,4 @@
-    using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class CarController : MonoBehaviour
@@ -7,10 +7,17 @@ public class CarController : MonoBehaviour
     private InputAction accelerateAction;
     private InputAction brakeAction;
 
+    [Header("Car Sprites")]
+    public Sprite normalCar;
+    public Sprite frontDamageCar;
+    public Sprite sideDamageCar;
+    public Sprite rearDamageCar;
+
+    private SpriteRenderer sr;
+
     [Header("Movement")]
     public float speed = 6f;
 
-    // межі дороги
     public float minX = -3.5f;
     public float maxX = 3.5f;
 
@@ -50,7 +57,12 @@ public class CarController : MonoBehaviour
 
     void Start()
     {
+        sr = GetComponent<SpriteRenderer>();
+
         startY = transform.position.y;
+
+        if (normalCar != null)
+            sr.sprite = normalCar;
     }
 
     void OnEnable()
@@ -72,37 +84,29 @@ public class CarController : MonoBehaviour
         if (isDead)
             return;
 
-        // A / D
         float move = moveAction.ReadValue<float>();
 
         Vector3 pos = transform.position;
 
         pos.x += move * speed * Time.deltaTime;
-
         pos.x = Mathf.Clamp(pos.x, minX, maxX);
 
-        // W
         if (accelerateAction.IsPressed())
         {
-            currentSpeed +=
-                acceleration * Time.deltaTime;
+            currentSpeed += acceleration * Time.deltaTime;
         }
 
-        // SPACE
         if (brakeAction.IsPressed())
         {
-            currentSpeed -=
-                brakePower * Time.deltaTime;
+            currentSpeed -= brakePower * Time.deltaTime;
         }
 
-        currentSpeed =
-            Mathf.Clamp(
-                currentSpeed,
-                minSpeed,
-                maxSpeed
-            );
+        currentSpeed = Mathf.Clamp(
+            currentSpeed,
+            minSpeed,
+            maxSpeed
+        );
 
-        // Візуальне зміщення машини
         float normalized =
             Mathf.InverseLerp(
                 minSpeed,
@@ -124,23 +128,57 @@ public class CarController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("EnemyCar"))
-        {
-            GameOver();
-        }
-    }
+        if (!other.CompareTag("EnemyCar"))
+            return;
 
-    void GameOver()
-    {
+        ShowDamage(other.transform.position);
+
         isDead = true;
 
-        Debug.Log("GAME OVER");
+        Invoke(nameof(FinishGame), 1f);
+    }
 
+    void FinishGame()
+    {
         gameOverPanel.SetActive(true);
 
         FindFirstObjectByType<DistanceManager>()
             .StopCounting();
 
         Time.timeScale = 0f;
+    }
+
+    void ShowDamage(Vector3 enemyPos)
+    {
+        Vector3 hitDir =
+            enemyPos - transform.position;
+
+        float absX = Mathf.Abs(hitDir.x);
+        float absY = Mathf.Abs(hitDir.y);
+
+        if (absY > absX)
+        {
+            if (hitDir.y > 0)
+            {
+                sr.sprite = frontDamageCar;
+            }
+            else
+            {
+                sr.sprite = rearDamageCar;
+            }
+        }
+        else
+        {
+            sr.sprite = sideDamageCar;
+
+            if (hitDir.x > 0)
+            {
+                sr.flipX = true;   // удар справа
+            }
+            else
+            {
+                sr.flipX = false;  // удар зліва
+            }
+        }
     }
 }
